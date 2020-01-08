@@ -98,6 +98,6 @@ function variable_operations() {
 if [[  $# -eq 0 ]] ; then
   list
 else
-  eval $@
+  $@
 fi
 

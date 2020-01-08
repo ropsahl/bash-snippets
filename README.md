@@ -26,6 +26,7 @@ My plans for today
 
 ```eval "$(oc get dc mtw-m-settings -n mtw-atest -o json |jq -r '.spec.template.spec.containers[]|.image'|sed 's;.*5000/\(.*\)/\(.*\);oc get isimage -n \1 \2 -o json;')" | jq '.image.dockerImageMetadata.Config.Labels|to_entries[]|select(.key|startswith("io.openshift.build.commit"))'```
 
+- find
 - grep
 - sed
 - curl
