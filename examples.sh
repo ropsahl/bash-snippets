@@ -94,9 +94,26 @@ function variable_operations() {
 
 }
 
+function encrypted_password_with_curl() {
+  echo By example, commands in ${RED} red ${WHITE} command output in ${GREEN} green
+  cat <<multiline
+${RED}$ cat me.txt
+${GREEN}user = "name:passwd"
+${RED}$ gpg -c me.txt
+$ gpg -d me.txt.gpg
+${GREEN}gpg: AES256 encrypted data
+gpg: encrypted with 1 passphrase
+user = "name:passwd"
+${RED}$ gpg -d me.txt.gpg |curl -K - --silent -H 'Content-type: application/json' https://your.server.com/bitbucket/rest/api/1.0/projects/PNAME/repos/repo-name/branches
+${GREEN}gpg: AES256 encrypted data
+gpg: encrypted with 1 passphrase
+{"errors":[{"context":null,"message":"Authentication failed. Please check your credentials and try again.","exceptionName":"com.atlassian.bitbucket.auth.IncorrectPasswordAuthenticationException"}]}user = "name:passwd"}
+multiline
+  echo ${WHITE}
+}
 #echo $@
 if [[  $# -eq 0 ]] ; then
-  list
+  list | sort
 else
   $@
 fi
