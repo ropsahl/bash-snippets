@@ -84,6 +84,11 @@ function curl_jq_fylker_og_kommuner() {
   curl -k -H 'Accept: application/json' https://ws.geonorge.no/kommuneinfo/v1/fylkerkommuner|jq '.[]|{"fylke": .fylkesnavn,"nummer": .fylkesnummer,"kommune": .kommuner[]| .gyldigeNavn[]|select(.navn != null)| .navn}'
 }
 
+function curl_jq_fylker_og_kommuner_sorted() {
+  # ./examples.sh curl_jq_fylker_og_kommuner | jq 'select(.kommune|startswith("Li"))'
+  curl -k -H 'Accept: application/json' https://ws.geonorge.no/kommuneinfo/v1/fylkerkommuner|jq -S '.[]|{"fylke": .fylkesnavn,"nummer": .fylkesnummer,"kommune": .kommuner[]| .gyldigeNavn[]|select(.navn != null)| .navn}'
+}
+
 function variable_operations() {
   v="Some text we can cut and we can slice"
   echo "${GREEN}The text:${WHITE}       $v"
@@ -110,6 +115,37 @@ gpg: encrypted with 1 passphrase
 {"errors":[{"context":null,"message":"Authentication failed. Please check your credentials and try again.","exceptionName":"com.atlassian.bitbucket.auth.IncorrectPasswordAuthenticationException"}]}user = "name:passwd"}
 multiline
   echo ${WHITE}
+}
+
+function json_remove_backslash_format() {
+  cat |sed 's;\\;;g' |jq .
+}
+
+function json_paths() {
+  #Trekk ut paths, join med "." for å elementer med space etc, legg på " først og sist og fix array index 0-99 med sed
+  cat $1 |jq -r 'paths |map(.|tostring)|join("\".\"")' | sed -e 's;^;";' -e 's;$;";' -e 's;\."\([0-9]\{1,2\}\)";\[\1\];'
+}
+
+function for_list_of_strings() {
+  declare -a p=('"a"' '"b c d"')
+  for p in "${p[@]}";do
+    echo $p;
+  done
+}
+
+function json_edit_jq() {
+  local json='{"data":{"name": "knut"}}'
+  echo  Original: $json
+
+  echo $json |jq  --arg v 4 '.data.vekt = $v'
+
+  local var='en to tre'
+  echo $json |jq  --arg v "$var" '.data.vekt = $v'
+}
+
+function arguments() {
+  echo $#
+  echo $@
 }
 #echo $@
 if [[  $# -eq 0 ]] ; then
